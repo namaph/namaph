@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from starlette.requests import Request
+from starlette.middleware.cors import CORSMiddleware
 
 from typing import Optional, List
 
@@ -8,6 +9,14 @@ import routers.namaphio as namaphio
 import routers.simio as simio
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 
 @app.get('/')
