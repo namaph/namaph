@@ -10,7 +10,7 @@ export function Vizthemelist() {
     return (
         <div className={styles.vizhoge}>
             <form>
-                {modlist.map(m => <Viztheme name={value} value={m.name}/>)}
+                {modlist.map(m => <Viztheme name={value} value={m.name} ioname={m.ioname}/>)}
             </form>
         </div>
     )
