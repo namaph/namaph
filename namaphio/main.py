@@ -4,9 +4,9 @@ from starlette.middleware.cors import CORSMiddleware
 
 from typing import Optional, List
 
-import routers.cityio as cityio
-import routers.namaphio as namaphio
-import routers.simio as simio
+from .routers import cityio
+from .routers import namaphio
+from .routers import simio
 
 app = FastAPI()
 

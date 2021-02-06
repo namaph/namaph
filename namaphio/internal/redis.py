@@ -18,7 +18,7 @@ def register_db(host: str, port: int, db: Union[int, List[int]]):
     return get_database
 
 
-with open('./config.yml', 'r') as f:
+with open('namaphio/config.yml', 'r') as f:
     config = yaml.safe_load(f)['redis']
 
 get_database = register_db(
