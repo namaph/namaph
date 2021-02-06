@@ -25,5 +25,5 @@ class CumsumHeatpmap():
 
         return {
             'name': 'Economical Impact',
-            'heatmap': self.hist
+            'heatmap': self.hist.copy()
         }

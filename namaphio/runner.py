@@ -3,15 +3,16 @@ from .simulators.example import random_heatmap, CumsumHeatpmap
 
 simulator = Simulator()
 
+userfunc = CumsumHeatpmap()
 simulator.setup([
     Module(
         name='Econimpact',
-        in_field='geogrid',
-        func=random_heatmap
+        in_field=None,
+        func=userfunc
     ),
     Module(
         name='Ecoimpact',
         in_field='geogrid',
-        func=CumsumHeatpmap()
+        func=random_heatmap
     )
 ])

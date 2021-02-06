@@ -19,8 +19,6 @@ def start_sim(
     background_tasks: BackgroundTasks,
     table: Optional[str] = Path(..., title="Table name in DB", example='roppongi'),
     sims: Optional[List[str]] = Query(None, title="List Of SimulationName", example=['Ecoimpact']),
-    fps: Optional[int] = Query(10, title="Simulation fps", example=10),
-    duration: Optional[int] = Query(200, title="Simulation span", example=200),
     db: Optional[Any] = Depends(connect_database)
 ):
     background_tasks.add_task(
@@ -28,8 +26,6 @@ def start_sim(
         names=sims,
         db=db,
         table=table,
-        fps=fps,
-        duration=duration
     )
     return Response(status_code=status.HTTP_201_CREATED)
 
