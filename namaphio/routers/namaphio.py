@@ -146,7 +146,7 @@ async def post_table(
     que = check_post_que(body)
     for n, field, cont in que:
         db(n).hset(table, field, cont)
-        field = f'mode:{field}' if n == 2 else field
+        field = f'mod:{field}' if n == 2 else field
         db(0).hset(table, field, hashlib.sha256(cont.encode()).hexdigest())
     return Response(status_code=status.HTTP_200_OK)
 
