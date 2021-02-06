@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 from fastapi.responses import ORJSONResponse
+import requests
+
+import yaml
 
 from typing import List, Dict, Any
 
@@ -7,6 +10,11 @@ router = APIRouter(
     prefix='/cityio',
     tags=['compat'],
 )
+
+with open('namaphio/config.yml', 'r') as f:
+    config = yaml.safe_load(f)['cityio']
+host = config['host']
+methods = config['methods']
 
 
 @router.get("/tables/list")
@@ -17,7 +25,8 @@ async def list_tables():
     Returns:
     List[]
     """
-    pass
+    res = requests.get(f"{host}{methods['ListTables']}")
+    return res.json()
 
 
 @router.get("/table/{table}")

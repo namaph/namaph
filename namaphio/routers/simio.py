@@ -4,8 +4,8 @@ from fastapi import Query, Path, Depends, Response, status, Body, HTTPException
 
 from typing import List, Dict, Any, Optional, Union, Callable
 
-from dependencies import connect_database
-import runner
+from ..dependencies import connect_database
+from .. import runner
 
 router = APIRouter(
     prefix="/simulator",
