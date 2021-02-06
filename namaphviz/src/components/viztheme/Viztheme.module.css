@@ -1,0 +1,20 @@
+.hogepiyo {
+  margin-bottom:20px;
+}
+.themeradio {
+  display: none;
+}
+.themelabel{
+  color: #FFF;
+  font-size: 11px;
+  display: block;
+  text-align: center;
+  margin-top: 5px;
+
+}
+.selectorwrapper:hover{
+  border: 2px #FFF solid;
+}
+.themeradio:checked + *{
+  border: 2px #FFF solid;
+}

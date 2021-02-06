@@ -1,0 +1,38 @@
+{
+    "apiURL": "https://localhost:8080",
+
+    "modules": [
+        {
+            "name": "Bio Mass",
+            "ioname": "Biomass",
+            "indicators": [
+                "Biomass:sum",
+                "Biomass:mean",
+                "Biomass:var"
+            ]
+        },
+        {
+            "name": "Bio Diversity",
+            "ioname": "Biodiv",
+            "indicators": [
+                "Biodiv:alpha",
+                "Biodiv:beta",
+                "Biodiv:gamma",
+                "Biodiv:spec"
+            ]
+        },
+        {
+            "name": "Human Health",
+            "ioname": "Pathsup",
+            "indicators": [
+                "Pathsup:boxplot"
+            ]
+        }
+    ],
+
+    "seekConf": {
+      "defaultValue": 2020,
+      "valueMin": 2021,
+      "valueMax": 2045
+    }
+}
