@@ -21,7 +21,7 @@ class CumsumHeatpmap():
     def __call__(self, types: List[Any]):
         temp = random.random()
         self.base_val += temp
-        self.hist.append({'id': len(types), 'value': self.base_val})
+        self.hist.append({'id': len(self.hist), 'value': self.base_val})
 
         return {
             'name': 'Economical Impact',
