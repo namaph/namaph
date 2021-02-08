@@ -18,72 +18,6 @@ router = APIRouter(
 re_mod = re.compile('mod:')
 
 
-# DB structure
-# DB[0] Meta field & List of Tables
-#  - tables: Set, List of all tables
-#  - {table}: Hash, Meta Field of each Table
-#    - meta: str, Constant meta data like apiversion
-#    - header: str, Hash info
-#    - types: str, Hash info
-#    - geogrid: str, Hash info
-#    - mod:{module}: str, Hash info
-#
-# DB[1] Local Constant Data
-#  - {table}: Hash, Contents
-#    - header: str, User configure
-#    - types: str, Types info used in GeoGrid and Mods
-#    - geoGrid: str, Geometry info bound with grids
-#
-# DB[2] Simulated Data
-#  - {table}
-#    - {module}: str, module output data
-
-
-def get_field(db, table: str, field: Union[str, List[str]]):
-    res = {}
-    for _f in field:
-        f = _f.lower()
-        if f == 'meta':
-            cont = db(0).hgetall(table)
-            temp = json.loads(cont.pop(b'meta'))
-            temp[b'hashes'] = cont
-        elif f in ['header', 'types', 'geogrid']:
-            temp = json.loads(db(1).hget(table, f))
-        elif f == 'modules':
-            temp = {k.decode(): json.loads(v) for k, v in db(2).hgetall(table).items()}
-        elif re_mod.match(f):
-            f = re_mod.sub('', f)
-            cont = db(2).hget(table, f)
-            if cont is None:
-                raise HTTPException(status_code=404, detail=f"Field not found > {_f}")
-            temp = json.loads(cont)
-        else:
-            raise HTTPException(status_code=404, detail=f"Field not found > {_f}")
-        res[f] = temp
-    return res
-
-
-def check_post_que(body: Dict[str, Any]):
-    res = []
-
-    for k, v in body.items():
-        f = k.lower()
-        if re_mod.match(f):
-            res.append((2, re_mod.sub('', f), json.dumps(v)))
-        elif f in ['header', 'types', 'geogrid']:
-            res.append((1, f, json.dumps(v)))
-        elif f == 'modules':
-            for modk, modv in v.items():
-                res.append([2, modk.lower(), json.dumps(modv)])
-        elif f == 'meta':
-            raise HTTPException(status_code=403, detail=f"DO NOT EDIT META FIELD")
-        else:
-            raise HTTPException(status_code=404, detail=f"Field not found > {k}")
-    return res
-
-
-
-
 @router.get('/tables')
 async def list_tables(
     db: Optional[Any] = Depends(connect_database)
@@ -94,7 +28,7 @@ async def list_tables(
     Returns:
       List[str]: Table names
     """
-    return db(0).smembers('tables')
+    return db.get_tables()
 
 
 @router.get('/table/{table}')
@@ -114,14 +48,35 @@ async def get_table(
       Dict[str, Any]: Table fiels specified in `field` argument. If field was None, return all of the fields.
     """
     if field is None:
-        temp = db(0).hgetall(table)
-        meta = json.loads(temp.pop(b'meta'))
-        meta[b'hashes'] = temp
+        meta = db.get_meta_all(table)
+        local = db.get_local_all(table)
+        mod = db.get_mod_all(table)
+        return {"meta": meta, "mod": mod, **local}
+    else:
+        l_meta = []
+        l_local = []
+        l_mod = []
+        f_mods = False
 
-        cont = {k.decode(): json.loads(v) for k, v in db(1).hgetall(table).items()}
-        mods = {k.decode(): json.loads(v) for k, v in db(2).hgetall(table).items()}
-        return {'meta': meta, 'modules': mods, **cont}
-    return get_field(db, table, field)
+        for _f in field:
+            f = _f.lower()
+            if f == 'meta':
+                l_meta.append(f)
+            elif f in ('header', 'geogrid', 'types'):
+                l_local.append(f)
+            elif f == 'modules':
+                f_mods = True
+            elif re_mod.match(f):
+                l_mod.append(f)
+
+        meta = {} if l_meta == [] else {"meta": db.get_meta_all(table)}
+        local = {} if l_local == [] else {k: v for k, v in zip(l_local, db.get_local(table, l_local))}
+
+        if f_mods:
+            mod = {'mods': db.get_mod_all(table)}
+        else:
+            mod = {} if l_mod == [] else {k: v for k, v in zip(l_mod, db.get_mod(table, l_mod))}
+    return {**meta, **local, **mod}
 
 
 @router.post('/table/{table}')
@@ -143,12 +98,20 @@ async def post_table(
         str: Response 403
         str: Response 404
     """
-    que = check_post_que(body)
-    for n, field, cont in que:
-        db(n).hset(table, field, cont)
-        field = f'mod:{field}' if n == 2 else field
-        db(0).hset(table, field, hashlib.sha256(cont.encode()).hexdigest())
-    return Response(status_code=status.HTTP_200_OK)
+    local = {}
+    mod = {}
+
+    for _k, v in body.items():
+        k = _k.lower()
+        if k in ('header', 'geogrid', 'types'):
+            local[k] = v
+        elif re_mod.match(k):
+            mod[k] = v
+
+    db.set_local(table, local)
+    db.set_mod(table, mod)
+
+    return [*local.keys(), *mod.keys()]
 
 
 @router.delete('/table/{table}')
@@ -167,24 +130,17 @@ async def delete_table(
     Returns:
       Dict[str, Any]: Table fiels specified in `field` argument. If field was None, return all of the fields.
     """
-    if 'meta' in [f.lower() for f in field]:
-        raise HTTPException(status_code=403, detail=f"DO NOT EDIT META FIELD")
+    local = []
+    mod = []
 
-    res = []
-    for _f in field:
-        f = _f.lower()
-        if f in ['header', 'types', 'geogrid']:
-            ap = db(1).hset(table, f, '{}')
-            db(0).hset(table, f, '{}')
-        elif f == 'modules':
-            for i in [i.decode() for i in db(2).hkeys(table)]:
-                db(0).hdel(table, f'mod:{i}')
-            ap = db(2).delete(table)
-        elif re_mod.match(f):
-            f = re_mod.sub('', f)
-            ap = db(2).hdel(table, f)
-            db(0).hdel(table, f'mod:{f}')
-        if ap != 0:
-            res.append(_f)
+    for _k in field:
+        k = _k.lower()
+        if k in ('header', 'geogrid', 'types'):
+            local.append(k)
+        elif re_mod.match(k):
+            mod.append(k)
 
-    return res
+    db.del_local(table, local)
+    db.del_mod(table, mod)
+
+    return [*local, *mod]
