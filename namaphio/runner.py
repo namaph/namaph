@@ -7,7 +7,7 @@ userfunc = CumsumHeatpmap()
 simulator.setup([
     Module(
         name='Econimpact',
-        in_field=None,
+        in_field='all',
         func=userfunc
     ),
     Module(

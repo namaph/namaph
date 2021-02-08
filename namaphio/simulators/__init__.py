@@ -42,9 +42,8 @@ class Simulator():
         return self.sims.keys()
 
     def check_update(self, db, table: str):
-        temp = db.get_meta_all(table)
+        temp = db.get_meta_all(table)['hashes']
         res = {f: temp[f] != h for f, h in self.meta.items()}
-        self.meta = temp
         return res
 
     def iter_sim(self, sim_list: List[str], sim_res: Dict[str, List[Any]], db, table):
@@ -67,41 +66,53 @@ class Simulator():
         for i in sim_list:
             self.jobs[i] = state
 
-    def log(self, name: str, state: State, msg: Any):
+    def logging(self, name: str, state: State, msg: Any):
         self.log.append({name: {"state": state.name, "msg": msg}})
 
     def run(self, names: List[str], db, table) -> None:
         for i in names:
             if i not in self.sims.keys():
-                self.log(i, State.Error, f'ModuleName <{i}> Not Found')
+                self.logging(i, State.Error, f'ModuleName <{i}> Not Found')
                 return
 
         self.set_state(names, State.Running)
+
+        db.set_mod(table, {k: {} for k in names})
 
         sim_list = names
         sim_res = {i: [] for i in sim_list}
 
         print(f'Start Running > {sim_list}')
-        self.meta = db.get_meta_all(table)
+        self.meta = db.get_meta_all(table)['hashes']
+
+        first = True
 
         for _ in range(config['duration']):
             if len(sim_list) == 0:
+                print('No sim left, Done')
                 return
             changes = self.check_update(db, table)
-            err = self.iter_sim(sim_list, sim_res, db, table)
+            if first:
+                changes = {k: True for k in db.get_meta_all(table)['hashes'].keys()}
+                first = False
+            changes['all'] = True
+            cur = [changes[self.sims[s].in_field] and s for s in sim_list]
+            err = self.iter_sim(filter(lambda x: x is not False, cur), sim_res, db, table)
+            self.meta = db.get_meta_all(table)['hashes']
 
             if err is not None:
                 e, sim = err
                 print(f'Unexpected Error occured: {e.args}')
                 self.set_state(sim_list, State.Terminated)
                 self.jobs[sim.name] = State.Error
-                self.log(sim.name, State.Error, [str(type(e)), e.args, traceback.format_exc()])
+                self.logging(sim.name, State.Error, [str(type(e)), e.args, traceback.format_exc()])
                 return
 
-            for job, state in self.jobs.items():
+            for sim in sim_list:
+                state = self.jobs[sim]
                 if state == State.Cancelled:
-                    sim_list.remove(job)
-                    print(f'Cancelled: {job} > Left: {sim_list}')
+                    sim_list.remove(sim)
+                    print(f'Cancelled: {sim} > Left: {sim_list}')
 
             sleep(1 / config['fps'])
 
