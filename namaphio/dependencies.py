@@ -8,4 +8,4 @@ def get_connection(request: Request):
 
 
 async def connect_database(request: Request):
-    return lambda db: get_database(db)
+    return get_database()
