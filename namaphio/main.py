@@ -8,6 +8,8 @@ from .routers import cityio
 from .routers import namaphio
 from .routers import simio
 
+from .internal.redis import get_database
+
 app = FastAPI()
 
 app.add_middleware(
@@ -17,6 +19,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+
+@app.on_event("startup")
+async def clear_cache():
+    db = get_database()
+    db.clear_cache()
 
 
 @app.get('/')

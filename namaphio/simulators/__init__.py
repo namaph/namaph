@@ -33,8 +33,6 @@ class State(Enum):
 class Simulator():
     def __init__(self):
         self.sims = {}
-        self.jobs = {}
-        self.log = []
         self.meta = {}
 
     def setup(self, sims: List[Module]) -> Any:
@@ -51,7 +49,7 @@ class Simulator():
             for n in sim_list:
                 sim = self.sims[n]
                 data = None
-                if sim.in_field is None:
+                if sim.in_field == 'all':
                     data = db.get_local_all(table)
                 else:
                     data = db.get_local(table, [sim.in_field.lower()])[0]
@@ -62,27 +60,25 @@ class Simulator():
         except Exception as e:
             return e, sim
 
-    def set_state(self, sim_list: List[str], state: State):
-        for i in sim_list:
-            self.jobs[i] = state
+    def logging(self, db, name: str, state: State, msg: Any):
+        cont = {name: {"state": state.name, "msg": msg}}
+        log = db.get_temp(['log'])
+        db.set_temp({'log': {**(log or {}), **cont}})
 
-    def logging(self, name: str, state: State, msg: Any):
-        self.log.append({name: {"state": state.name, "msg": msg}})
-
-    def run(self, names: List[str], db, table) -> None:
+    def run(self, id: str, names: List[str], db, table) -> None:
         for i in names:
             if i not in self.sims.keys():
-                self.logging(i, State.Error, f'ModuleName <{i}> Not Found')
+                self.logging(db, i, State.Error, f'ModuleName <{i}> Not Found')
                 return
-
-        self.set_state(names, State.Running)
 
         db.set_mod(table, {k: {} for k in names})
 
         sim_list = names
         sim_res = {i: [] for i in sim_list}
+        chan = db.subscribe_channel(id)
 
         print(f'Start Running > {sim_list}')
+        db.set_temp({id: State.Running.name})
         self.meta = db.get_meta_all(table)['hashes']
 
         first = True
@@ -103,29 +99,30 @@ class Simulator():
             if err is not None:
                 e, sim = err
                 print(f'Unexpected Error occured: {e.args}')
-                self.set_state(sim_list, State.Terminated)
-                self.jobs[sim.name] = State.Error
-                self.logging(sim.name, State.Error, [str(type(e)), e.args, traceback.format_exc()])
+                db.set_temp({id: State.Error.name})
+                self.logging(db, sim.name, State.Error, [str(type(e)), e.args, traceback.format_exc()])
                 return
 
-            for sim in sim_list:
-                state = self.jobs[sim]
-                if state == State.Cancelled:
-                    sim_list.remove(sim)
-                    print(f'Cancelled: {sim} > Left: {sim_list}')
+            msg = chan.get_message()
+            if (msg is not None) and (msg['data'] == State.Cancelled.name):
+                print(f'Cancelled: {id} > {sim_list}')
+                db.set_temp({id: State.Cancelled.name})
+                return
 
             sleep(1 / config['fps'])
 
         print(f'Done > {sim_list}')
-        self.set_state(sim_list, State.Done)
+        db.set_temp({id: State.Done.name})
 
-    def stop(self, names: List[str]) -> bool:
-        print(f'Recieve termination signal > {names}')
-        for i in names:
-            if i not in self.jobs.keys() or self.jobs[i] != State.Running:
-                return False
-        self.set_state(names, State.Cancelled)
+    def stop(self, db, ids: List[str]) -> bool:
+        for i in ids:
+            print(f'Recieve termination signal > {i}')
+            db.publish_msg(i, State.Cancelled.name)
         return True
 
-    def get_jobs(self):
-        return {'state': {k: v.name for k, v in self.jobs.items()}, 'log': self.log}
+    def get_jobs(self, db):
+        job = db.get_temp_all()
+        log = {}
+        if 'log' in job.keys():
+            log = job.pop('log')
+        return {'state': {k: v for k, v in job.items()}, 'log': log}
