@@ -20,6 +20,7 @@ import json
 #  - {table}
 #    - {module}: str, module output data
 
+
 class NamaphDB():
     """
 DB[0] Meta field & List of Tables
@@ -161,6 +162,50 @@ DB[3] Fetched Data
         data = pipe.execute()
         d_m = pipe_m.execute()
         return data
+
+    def get_temp_all(self):
+        r = redis.StrictRedis(connection_pool=self.pool["meta"])
+        raw = r.hgetall('temp')
+        data = {k: json.loads(v) for k, v in raw.items()}
+        return data
+
+    def get_temp(self, where: Iterable[str]) -> List[Any]:
+        r = redis.StrictRedis(connection_pool=self.pool["meta"])
+        pipe = r.pipeline()
+
+        for f in where:
+            pipe.hget('temp', f)
+        data = [None if i is None else json.loads(i) for i in pipe.execute()]
+        return data
+
+    def set_temp(self, cont: Dict[str, Any]) -> List[int]:
+        r = redis.StrictRedis(connection_pool=self.pool["meta"])
+        pipe = r.pipeline()
+
+        for k, v in cont.items():
+            c = json.dumps(v)
+            pipe.hset('temp', k, c)
+        data = pipe.execute()
+        return data
+
+    def clear_cache(self):
+        r = redis.StrictRedis(connection_pool=self.pool["meta"])
+        r.delete('temp')
+
+    def publish_msg(self, channel: str, msg: str):
+        r = redis.StrictRedis(connection_pool=self.pool['mod'])
+        r.publish(channel, msg)
+
+    def subscribe_channel(self, channel: str):
+        r = redis.StrictRedis(connection_pool=self.pool['mod'])
+        ps = r.pubsub()
+
+        ps.subscribe(channel)
+        return ps
+
+    def get_channels(self):
+        r = redis.StrictRedis(connection_pool=self.pool['mod'])
+        return r.pubsub_channels()
 
 
 def register_db(host: str, port: int):
