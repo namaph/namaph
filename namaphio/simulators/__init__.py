@@ -71,7 +71,7 @@ class Simulator():
                 self.logging(db, i, State.Error, f'ModuleName <{i}> Not Found')
                 return
 
-        db.set_mod(table, {k: {} for k in names})
+        db.set_mod(table, {f"mod:{k.lower()}": {} for k in names})
 
         sim_list = names
         sim_res = {i: [] for i in sim_list}

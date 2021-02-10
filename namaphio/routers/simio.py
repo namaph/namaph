@@ -31,12 +31,12 @@ def start_sim(
         db=db,
         table=table,
     )
-    return 201, id
+    return id
 
 
 @router.get('/stop')
 def stop_sim(
-    sims: Optional[List[str]] = Query(None, title="List Of SimulationName", example=['Ecoimpact']),
+    ids: Optional[List[str]] = Query(None, title="List Of Session ID"),
     db: Optional[Any] = Depends(connect_database)
 ):
     res = status.HTTP_202_ACCEPTED if runner.simulator.stop(db, sims) else status.HTTP_403_FORBIDDEN
