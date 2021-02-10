@@ -1,6 +1,6 @@
 from starlette.requests import Request
 
-from internal.redis import get_database
+from .internal.redis import get_database
 
 
 def get_connection(request: Request):
@@ -8,4 +8,4 @@ def get_connection(request: Request):
 
 
 async def connect_database(request: Request):
-    return lambda db: get_database(db)
+    return get_database()

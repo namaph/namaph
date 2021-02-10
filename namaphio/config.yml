@@ -3,4 +3,19 @@ redis:
   port: 6379
   db:
     - 0 # List of table
-    - 1 # Roppongi
+    - 1 # Local Data
+    - 2 # Module Data
+    - 3 # Fetching Data
+
+simulator:
+  fps: 10
+  duration: 300
+
+
+cityio:
+  host: https://cityio.media.mit.edu/api
+  methods:
+    ListTables: /tables/list
+    GetTable: /table/{table}
+    PostTable: /table/update/{table}/{field}
+    DeleteTable: /table/clear/{table}/{field}

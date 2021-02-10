@@ -7,7 +7,7 @@ from fastapi.responses import ORJSONResponse
 import hashlib
 import re
 import json
-from dependencies import connect_database
+from ..dependencies import connect_database
 
 router = APIRouter(
     prefix="",
@@ -15,97 +15,7 @@ router = APIRouter(
     default_response_class=ORJSONResponse,
 )
 
-re_mod = re.compile('Mod:')
-
-
-# DB structure
-# DB[0]
-#  - Tables: Set, List of all tables
-#  - {Table}: Hash, Meta Field of each Table
-#    - Meta: str, Constant meta data like apiversion
-#    - Header: str, Hash info
-#    - Types: str, Hash info
-#    - GeoGrid: str, Hash info
-#    - Mod:{Module}: str, Hash info
-#
-# DB[1]
-#  - {Table}: Hash, Contents
-#    - Header: str, User configure
-#    - Types: str, Types info used in GeoGrid and Mods
-#    - GeoGrid: str, Geometry info bound with grids
-#    - Mod:{Module}: str, module output data
-
-
-def get_field(db, table: str, field: Union[str, List[str]]):
-    res = {}
-    for _f in field:
-        f = _f.capitalize()
-        if f == 'Meta':
-            cont = db(0).hgetall(table)
-            temp = json.loads(cont.pop(b'meta'))
-            temp[b'hashes'] = cont
-        elif f in ['Header', 'Types', 'Geogrid']:
-            temp = json.loads(db(1).hget(table, f))
-        elif f == 'Modules':
-            f = 'Modules'
-            temp = {}
-            for i in [k.decode() for k in db(1).hkeys(table)]:
-                if re_mod.match(i):
-                    temp[re_mod.sub('', i)] = json.loads(db(1).hget(table, i))
-        elif re_mod.match(f):
-            f = f"Mod:{re_mod.sub('', f).capitalize()}"
-            cont = db(1).hget(table, f)
-            if cont is None:
-                raise HTTPException(status_code=404, detail=f"Field not found > {_f}")
-            temp = json.loads(cont)
-        else:
-            raise HTTPException(status_code=404, detail=f"Field not found > {_f}")
-        res[f] = temp
-    return res
-
-
-def check_bodykeys(body: Dict[str, Any]):
-    res = []
-
-    for k, v in body.items():
-        f = k.capitalize()
-        if re_mod.match(f):
-            f = f"Mod:{re_mod.sub('', f).capitalize()}"
-            res.append([f, v])
-        elif f in ['Header', 'Types', 'Geogrid']:
-            res.append([f, v])
-        elif f == 'Modules':
-            for modk, modv in v.items():
-                res.append([f"Mod:{modk.capitalize()}", modv])
-        elif f == 'Meta':
-            raise HTTPException(status_code=403, detail=f"DO NOT EDIT META FIELD")
-        else:
-            raise HTTPException(status_code=404, detail=f"Field not found > {k}")
-    return res
-
-
-def check_db(db, table: str, field: List[str]):
-    res = []
-
-    for _f in field:
-        f = _f.capitalize()
-        if f in ['Header', 'Types', 'Geogrid']:
-            res.append([f, '{}'])
-        elif f == 'Modules':
-            for k in [i.decode() for i in db(1).hgetall(table)]:
-                if re_mod.match(k):
-                    res.append([k, None])
-        elif re_mod.match(f):
-            f = f"Mod:{re_mod.sub('', f).capitalize()}"
-            is_match = [1 if f == i.decode() else 0 for i in db(1).hgetall(table)]
-            if sum(is_match) == 0:
-                raise HTTPException(status_code=404, detail=f"Field not found > {_f}")
-            res.append([f, None])
-        elif f == 'Meta':
-            raise HTTPException(status_code=403, detail=f"DO NOT EDIT META FIELD")
-        else:
-            raise HTTPException(status_code=404, detail=f"Field not found > {_f}")
-    return res
+re_mod = re.compile('mod:')
 
 
 @router.get('/tables')
@@ -118,7 +28,7 @@ async def list_tables(
     Returns:
       List[str]: Table names
     """
-    return db(0).smembers('Tables')
+    return db.get_tables()
 
 
 @router.get('/table/{table}')
@@ -138,20 +48,35 @@ async def get_table(
       Dict[str, Any]: Table fiels specified in `field` argument. If field was None, return all of the fields.
     """
     if field is None:
-        temp = db(0).hgetall(table)
-        meta = json.loads(temp.pop(b'meta'))
-        meta[b'hashes'] = temp
+        meta = db.get_meta_all(table)
+        local = db.get_local_all(table)
+        mod = db.get_mod_all(table)
+        return {"meta": meta, "mod": mod, **local}
+    else:
+        l_meta = []
+        l_local = []
+        l_mod = []
+        f_mods = False
 
-        cont = db(1).hgetall(table)
-        mods = {}
-        for _k in list(cont.keys()):
-            k = _k.decode()
-            if k in ('Header', 'Geogrid', 'Types'):
-                cont[_k] = json.loads(cont[_k])
-            else:
-                mods[re_mod.sub("", k)] = json.loads(cont.pop(_k))
-        return {'Meta': meta, 'Modules': mods, **cont}
-    return get_field(db, table, field)
+        for _f in field:
+            f = _f.lower()
+            if f == 'meta':
+                l_meta.append(f)
+            elif f in ('header', 'geogrid', 'types'):
+                l_local.append(f)
+            elif f == 'modules':
+                f_mods = True
+            elif re_mod.match(f):
+                l_mod.append(f)
+
+        meta = {} if l_meta == [] else {"meta": db.get_meta_all(table)}
+        local = {} if l_local == [] else {k: v for k, v in zip(l_local, db.get_local(table, l_local))}
+
+        if f_mods:
+            mod = {'mods': db.get_mod_all(table)}
+        else:
+            mod = {} if l_mod == [] else {k: v for k, v in zip(l_mod, db.get_mod(table, l_mod))}
+    return {**meta, **local, **mod}
 
 
 @router.post('/table/{table}')
@@ -173,12 +98,20 @@ async def post_table(
         str: Response 403
         str: Response 404
     """
-    que = check_bodykeys(body)
-    for field, _cont in que:
-        cont = json.dumps(_cont)
-        db(1).hset(table, field, cont)
-        db(0).hset(table, field, hashlib.sha256(cont.encode()).hexdigest())
-    return Response(status_code=status.HTTP_200_OK)
+    local = {}
+    mod = {}
+
+    for _k, v in body.items():
+        k = _k.lower()
+        if k in ('header', 'geogrid', 'types'):
+            local[k] = v
+        elif re_mod.match(k):
+            mod[k] = v
+
+    db.set_local(table, local)
+    db.set_mod(table, mod)
+
+    return [*local.keys(), *mod.keys()]
 
 
 @router.delete('/table/{table}')
@@ -197,12 +130,17 @@ async def delete_table(
     Returns:
       Dict[str, Any]: Table fiels specified in `field` argument. If field was None, return all of the fields.
     """
-    que = check_db(db, table, field)
-    for field, state in que:
-        if state is None:
-            db(1).hdel(table, field)
-            db(0).hdel(table, field)
-        else:
-            db(1).hset(table, field, state)
-            db(0).hset(table, field, state)
-    return Response(status_code=status.HTTP_200_OK)
+    local = []
+    mod = []
+
+    for _k in field:
+        k = _k.lower()
+        if k in ('header', 'geogrid', 'types'):
+            local.append(k)
+        elif re_mod.match(k):
+            mod.append(k)
+
+    db.del_local(table, local)
+    db.del_mod(table, mod)
+
+    return [*local, *mod]
