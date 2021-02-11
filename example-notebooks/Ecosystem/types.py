@@ -16,12 +16,12 @@ class Ecosystem(NamedTuple):
     df = pd.DataFrame({"res": res, **{f"spc_{i}": s for i, s in enumerate(spc)}})
     return df.describe()
   
-  def heatmap(self):
+  def heatmap(self, annot=True):
     fig, ax = plt.subplots(1, 2, figsize=(14, 5))
     z, y, x = self.species.shape
-    sns.heatmap(self.resource, ax=ax[0], annot=True)
+    sns.heatmap(self.resource, ax=ax[0], annot=annot)
     ax[0].set_title('Resource')
-    sns.heatmap(np.dstack([np.zeros((y,x)), *self.species]).argmax(axis=2), ax=ax[1], annot=True)
+    sns.heatmap(np.dstack([np.zeros((y,x)), *self.species]).argmax(axis=2), ax=ax[1], annot=annot)
     ax[1].set_title('Species')
     
   
