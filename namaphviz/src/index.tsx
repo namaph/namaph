@@ -6,16 +6,19 @@ import {Vizthemelist} from "./features/vizthemelist/Vizthemelist"
 import {Indicatorlist} from './features/indicatorlist/Indicatorlist'
 import {Mapcontroller} from './features/mapcontroller/Mapcontroller'
 import {Seekbar} from './features/seekbar/Seekbar'
+import {DeckMap} from './features/deckgl/Deckgl'
 
 import { store } from './store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
+
 
 // import ParentSize from '@visx/responsive/lib/components/ParentSize'
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
+      <DeckMap />
       <Vizthemelist />
       <Indicatorlist />
       <Mapcontroller />
