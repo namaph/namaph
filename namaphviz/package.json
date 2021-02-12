@@ -16,6 +16,7 @@
     "@types/react-dom": "^16.9.0",
     "@types/react-map-gl": "^5.2.9",
     "@types/react-redux": "^7.1.7",
+    "@types/recharts": "^1.8.19",
     "@types/styled-components": "^5.1.7",
     "@visx/axis": "^1.4.0",
     "@visx/brush": "^1.4.0",
@@ -34,6 +35,7 @@
     "react-map-gl": "^6.1.6",
     "react-redux": "^7.2.0",
     "react-scripts": "4.0.1",
+    "recharts": "^2.0.6",
     "styled-components": "^5.2.1",
     "typescript": "~3.8.2"
   },

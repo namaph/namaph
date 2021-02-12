@@ -9,7 +9,8 @@
                 "Biomass:sum",
                 "Biomass:mean",
                 "Biomass:var"
-            ]
+            ],
+            "icon": 0
         },
         {
             "name": "Bio Diversity",
@@ -19,7 +20,8 @@
                 "Biodiv:beta",
                 "Biodiv:gamma",
                 "Biodiv:spec"
-            ]
+            ],
+            "icon": 1
         },
         {
             "name": "Human Health",
@@ -27,12 +29,14 @@
             "indicators": [
                 "Pathsup:boxplot"
             ]
+            ,
+            "icon": 2
         }
     ],
 
     "seekConf": {
-      "defaultValue": 2020,
-      "valueMin": 2021,
-      "valueMax": 2045
+      "defaultValue": 2045,
+      "valueMin": 2045,
+      "valueMax": 2075
     }
 }

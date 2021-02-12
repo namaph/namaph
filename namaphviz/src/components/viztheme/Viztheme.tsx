@@ -2,17 +2,20 @@ import React from 'react';
 import styles from './Viztheme.module.css';
 import styled from 'styled-components';
 import iconBioMass from './namaph_icons_1.svg';
+import iconBioDiv from './namaph_icons_2.svg';
+import iconHumanHealth from './namaph_icons_3.svg';
 
-
+const icons = [iconBioMass,iconBioDiv,iconHumanHealth];
 
 const Selector = styled.div`
+  position: relative;
   width: 50px;
   height: 50px;
   margin-left:15px;
-  background-color: #222;
+  background-color: #f5f5f5;
   border-radius: 6px;
-  border: 2px #999 solid;
-  transition: border 0.2s ease;
+  border: 3px #fff solid;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   cursor:pointer;
   &:hover {
@@ -20,20 +23,34 @@ const Selector = styled.div`
   }
 `;
 
+const Icon = styled.img`
+  position: absolute;
+  width: 100%;
+  opacity: 0.5;
+  pointer-events: none;
+
+`;
+
 const Input = styled.input`
   display: none;
   &:checked + label > ${Selector} {
-    border: 2px #FFF solid;
+    background-color: #5DB6E8;
+  }
+  &:checked + label > ${Selector} > ${Icon} {
+    filter: invert();
+    opacity:1;
   }
 `;
+
+
 
 
 export function Viztheme (props: any) {
     return (
         <div className={styles.hogepiyo} >
-            <img src={iconBioMass} className={styles.icon}  />
             <Input type="radio" name={props.name} value={props.value} id={props.ioname} />
-            <label htmlFor={props.ioname}><Selector /><span className={styles.themelabel}>{props.value}</span></label>
+            <label htmlFor={props.ioname}><Selector><Icon src={icons[props.iconname]} /> </Selector><span className={styles.themelabel}>{props.value}</span></label>
+
         </div>
     );
 }

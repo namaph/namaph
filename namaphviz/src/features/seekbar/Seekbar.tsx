@@ -10,7 +10,7 @@ const seekconf = config.seekConf;
 
 const PrettoSlider = withStyles({
   root: {
-    color: '#AAA',
+    color: '#5DB6E8',
     height: 4,
     marginTop:4,
     marginLeft:100,
@@ -20,7 +20,7 @@ const PrettoSlider = withStyles({
     height: 16,
     width: 16,
     backgroundColor: '#fff',
-    border: '2px solid #000',
+    border: '2px solid #CCC',
     marginTop: -6,
     marginLeft: -8,
     '&:focus, &:hover, &$active': {
@@ -41,7 +41,7 @@ const PrettoSlider = withStyles({
     borderRadius: 2,
   },
   mark: {
-    backgroundColor: '#000',
+    backgroundColor: '#fff',
     height: 8,
     width: 2,
     marginTop: -3,

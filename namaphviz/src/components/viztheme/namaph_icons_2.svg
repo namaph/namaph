@@ -1,13 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <style>
-      .a {
-        fill: #fff;
-      }
-    </style>
-  </defs>
   <title>namaph_icons</title>
-  <circle class="a" cx="31.979" cy="68.948" r="11.979"/>
-  <rect class="a" x="57.984" y="57.94" width="22.016" height="22.016"/>
-  <polygon class="a" points="50.466 19.073 37.004 42.389 63.927 42.389 50.466 19.073"/>
+  <circle cx="31.979" cy="68.948" r="11.979"/>
+  <rect x="57.984" y="57.94" width="22.016" height="22.016"/>
+  <polygon points="50.466 19.073 37.004 42.389 63.927 42.389 50.466 19.073"/>
 </svg>

@@ -1,4 +1,26 @@
 .indhoge {
     background-color: none;
-    display: none;
+    position: absolute;
+    background-color: #f5f5f5;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    border-radius: 10px;
+    left: 130px;
+    top:50px;
+    padding-top:10px;
+    padding-bottom: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.insideBack{
+  width: 100%;
+  background-color: #fff;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+.graphtitle{
+  font-size: 14px;
+  line-height: 24px;
+  display: block;
+  margin-bottom: 5px;
 }

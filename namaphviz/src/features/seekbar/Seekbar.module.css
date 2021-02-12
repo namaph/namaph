@@ -1,13 +1,15 @@
 .seekhoge {
-    background-color: #000;
+    background-color: #FFF;
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 40px;
+    box-sizing: border-box;
+    border-top: 1px solid #CCC;
 }
 .yearstart{
-  color: #FFF;
+  color: #222;
   position: absolute;
   display: block;
   line-height: 40px;
@@ -15,7 +17,7 @@
   font-size: 16px;
 }
 .yearend{
-  color: #FFF;
+  color: #222;
   position: absolute;
   display: block;
   line-height: 40px;
