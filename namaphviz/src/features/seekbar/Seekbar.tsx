@@ -51,6 +51,8 @@ const PrettoSlider = withStyles({
 export function Seekbar() {
     return (
         <div className={styles.seekhoge} >
+        <span className={styles.yearstart}>{seekconf.valueMin}</span>
+        <span className={styles.yearend}>{seekconf.valueMax}</span>
             <PrettoSlider
                 defaultValue={seekconf.defaultValue}
                 aria-labelledby="discrete-slider-small-steps"

@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './Viztheme.module.css';
 import styled from 'styled-components';
+import iconBioMass from './namaph_icons_1.svg';
 
 
 
@@ -30,6 +31,7 @@ const Input = styled.input`
 export function Viztheme (props: any) {
     return (
         <div className={styles.hogepiyo} >
+            <img src={iconBioMass} className={styles.icon}  />
             <Input type="radio" name={props.name} value={props.value} id={props.ioname} />
             <label htmlFor={props.ioname}><Selector /><span className={styles.themelabel}>{props.value}</span></label>
         </div>

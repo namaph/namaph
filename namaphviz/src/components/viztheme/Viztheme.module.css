@@ -18,3 +18,10 @@
 .themeradio:checked + *{
   border: 2px #FFF solid;
 }
+.icon{
+  position: absolute;
+  width: 64%;
+  left:18%;
+  opacity: 0.7;
+  pointer-events: none;
+}
