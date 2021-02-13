@@ -1,10 +1,13 @@
 import React from 'react'
 import styles from './Seekbar.module.css';
+import { useDispatch, useSelector } from "react-redux";
 
 import Typography from '@material-ui/core/Typography'
 import Slider from '@material-ui/core/Slider'
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import config from '../../settings/config.json';
+
+import {setYear} from './seekbarSlice'
 
 const seekconf = config.seekConf;
 
@@ -49,6 +52,8 @@ const PrettoSlider = withStyles({
 })(Slider);
 
 export function Seekbar() {
+    const dispatch = useDispatch();
+
     return (
         <div className={styles.seekhoge} >
         <span className={styles.yearstart}>{seekconf.valueMin}</span>
@@ -61,6 +66,7 @@ export function Seekbar() {
                 min={seekconf.valueMin}
                 max={seekconf.valueMax}
                 valueLabelDisplay="auto"
+                onChangeCommitted={(evnet, val) => dispatch(setYear(val))}
             />
         </div>
     )

@@ -5,6 +5,9 @@ import iconBioMass from './namaph_icons_1.svg';
 import iconBioDiv from './namaph_icons_2.svg';
 import iconHumanHealth from './namaph_icons_3.svg';
 
+import { useDispatch, useSelector } from "react-redux";
+import { setIndex } from '../../features/vizthemelist/vizthemelistSlice'
+
 const icons = [iconBioMass,iconBioDiv,iconHumanHealth];
 
 const Selector = styled.div`
@@ -46,11 +49,12 @@ const Input = styled.input`
 
 
 export function Viztheme (props: any) {
+    let { idx } = props
+    const dispatch = useDispatch();
     return (
         <div className={styles.hogepiyo} >
-            <Input type="radio" name={props.name} value={props.value} id={props.ioname} />
+            <Input type="radio" name={props.name} value={props.value} id={props.ioname} onClick={(event) => dispatch(setIndex(idx))}/>
             <label htmlFor={props.ioname}><Selector><Icon src={icons[props.iconname]} /> </Selector><span className={styles.themelabel}>{props.value}</span></label>
-
         </div>
     );
 }

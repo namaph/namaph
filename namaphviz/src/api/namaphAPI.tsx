@@ -1,11 +1,18 @@
 import config from '../settings/config.json'
 
-const temp = config.modules
+let URL = config['apiURL']
+
+let APIList = {
+  Tables: `${URL}/tables`,
+  Table: `${URL}/table`,
+  Module: `${URL}/sim`
+}
 
 function Namaphio() {
   return {
-    tables: () => [`{temp.apiURL}sample`],
-    table: (table: string) => [`{table.apiURL*3}`]
+    GetTable: (table: string, field: string = "") => {
+      fetch(APIList.Table + `/${table}?field=${field}`)
+    }
   }
 }
 
