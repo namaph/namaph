@@ -20,3 +20,7 @@ bash-redis:
 .PHONY: start-io
 start-io:
 	@uvicorn namaphio:app --reload --port 8080 --host 0.0.0.0
+
+.PHONY: start-viz
+start-viz:
+	@cd ./namaphviz && yarn start
