@@ -28,3 +28,5 @@ yarn-error.log*
 .ipynb_checkpoints/
 CityGML/
 __pycache__/
+
+.eslintcache
