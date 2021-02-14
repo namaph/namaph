@@ -20,7 +20,7 @@
                 "Biomass:mean",
                 "Biomass:var"
             ],
-            "icon": 0
+            "icon": 1
         },
         {
             "name": "Bio Diversity",
@@ -31,7 +31,7 @@
                 "Biodiv:gamma",
                 "Biodiv:spec"
             ],
-            "icon": 1
+            "icon": 2
         },
         {
             "name": "Human Health",
@@ -40,7 +40,7 @@
                 "Pathsup:boxplot"
             ]
             ,
-            "icon": 2
+            "icon": 3
         }
     ],
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './Viztheme.module.css';
 import styled from 'styled-components';
+import iconMap from './namaph_icons_0.svg'
 import iconBioMass from './namaph_icons_1.svg';
 import iconBioDiv from './namaph_icons_2.svg';
 import iconHumanHealth from './namaph_icons_3.svg';
@@ -8,7 +9,7 @@ import iconHumanHealth from './namaph_icons_3.svg';
 import { useDispatch, useSelector } from "react-redux";
 import { setIndex } from '../../features/vizthemelist/vizthemelistSlice'
 
-const icons = [iconBioMass,iconBioDiv,iconHumanHealth];
+const icons = [iconMap, iconBioMass,iconBioDiv,iconHumanHealth];
 
 const Selector = styled.div`
   position: relative;
