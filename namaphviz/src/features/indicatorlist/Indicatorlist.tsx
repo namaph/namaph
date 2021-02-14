@@ -5,6 +5,8 @@ import { LineChart, Line, XAxis, YAxis } from 'recharts';
 import config from '../../settings/config.json';
 import styles from './Indicatorlist.module.css';
 import totalBiomass from '../../settings/total_biomass.json';
+import y from '../../settings/150y.json';
+
 
 const data = [
   {
@@ -54,6 +56,13 @@ const data = [
 
 export function Indicatorlist() {
     const modlist = config.modules[0].indicators
+    let range: Number = 100;
+    
+    var foo = [];
+    for (var i = 0; i <= range; i++) {
+      foo.push(`p_${i}`);
+    }
+
     return (
         <div className={styles.indhoge}>
           <span className={styles.graphtitle}>Total Biomass</span>
@@ -67,10 +76,10 @@ export function Indicatorlist() {
 
           <span className={styles.graphtitle}>Graph 2</span>
           <div className={styles.insideBack}>
-          <LineChart width={300} height={150} data={data} margin={{ top: 20, right: 20, left: 20, bottom: 20}}>
+          <LineChart width={300} height={150} data={y} margin={{ top: 20, right: 20, left: 20, bottom: 20}}>
             <XAxis tick={{fontSize: 10}} height={10}dataKey="name"  />
             <YAxis tick={{fontSize: 10}} width={20} />
-            <Line type="monotone" dataKey="uv" stroke="#5DB6E8" />
+            {foo.map(element => <Line type="monotone" dot={false} dataKey={element} stroke="#5DB6E8" />)}
           </LineChart>
           </div>
         </div>
