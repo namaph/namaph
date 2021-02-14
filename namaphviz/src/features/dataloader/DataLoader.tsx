@@ -27,8 +27,10 @@ export default function DataLoader(props: any) {
         console.log("Start Fetching: " + url)
         const modules = await getAPICall(url);
         console.log("modules here", modules);
-        dispatch(setGeogrid(modules.geogrid));
-        dispatch(setModule(modules.mod));
+        if (modules) {
+            dispatch(setGeogrid('geogrid' in modules ? modules.geogrid : []));
+            dispatch(setModule('mod' in modules ? modules.mod : {} ));
+        }
 
         // send to cityio
         console.log("done fetching from cityIO");

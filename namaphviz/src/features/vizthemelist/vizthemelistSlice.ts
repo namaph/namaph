@@ -20,7 +20,7 @@ export const vizthemelistSlice = createSlice({
 })
 
 
-export const { setIndex} = vizthemelistSlice.actions;
+export const { setIndex } = vizthemelistSlice.actions;
 
-export const selectReady = (state: RootState) => state.dataloader.ready;
+export const selectindex = (state: RootState) => state.vizthemelist.currentidx;
 export default vizthemelistSlice.reducer;

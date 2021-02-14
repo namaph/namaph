@@ -3,6 +3,16 @@
 
     "modules": [
         {
+            "name": "Map",
+            "ioname": "Map",
+            "indicators": [
+                "Map:sum",
+                "Map:mean",
+                "Map:var"
+            ],
+            "icon": 0
+        },
+        {
             "name": "Bio Mass",
             "ioname": "Biomass",
             "indicators": [
