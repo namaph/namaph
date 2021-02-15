@@ -157,6 +157,9 @@ export function DeckMap() {
         height="calc(100% - 40px)"
         layers={themelist}
         layerFilter = {({layer}) => {
+          if (layer.id == "0" || layer.id == "0-fill") {
+            return true
+          }
           if (layer.id == `${idx}` || layer.id == `${idx}-fill`) {
             return true
           }
