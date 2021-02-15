@@ -67,7 +67,7 @@ export function Seekbar() {
                 max={seekconf.valueMax}
                 valueLabelDisplay="auto"
                 // onChangeCommitted={(evnet, val) => dispatch(setYear(val))}
-                onChange={(evnet, val) => dispatch(setYear(val))}
+                onChange={(evnet, val) => dispatch(setYear(val - seekconf.valueMin))}
             />
         </div>
     )

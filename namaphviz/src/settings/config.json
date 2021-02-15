@@ -13,17 +13,17 @@
             "icon": 0
         },
         {
-            "name": "Bio Mass",
+            "name": "Default BioDiv",
             "ioname": "Biomass",
             "indicators": [
                 "Biomass:sum",
                 "Biomass:mean",
                 "Biomass:var"
             ],
-            "icon": 1
+            "icon": 2
         },
         {
-            "name": "Bio Diversity",
+            "name": "Railway BioDiv",
             "ioname": "Biodiv",
             "indicators": [
                 "Biodiv:alpha",
@@ -34,19 +34,19 @@
             "icon": 2
         },
         {
-            "name": "Human Health",
+            "name": "Raileway & Office BioDiv",
             "ioname": "Pathsup",
             "indicators": [
                 "Pathsup:boxplot"
             ]
             ,
-            "icon": 3
+            "icon": 2
         }
     ],
 
     "seekConf": {
-      "defaultValue": 2045,
-      "valueMin": 2045,
-      "valueMax": 2075
+      "defaultValue": 2020,
+      "valueMin": 2020,
+      "valueMax": 2170
     }
 }

@@ -10,21 +10,33 @@ import { useSelector } from "react-redux";
 import { selectindex } from "../vizthemelist/vizthemelistSlice"
 import { selectYear } from "../seekbar/seekbarSlice"
 
-import geomap from '../../settings/0/heatmap.json'
-import biodiv from '../../settings/1/heatmap.json'
-import biomass from '../../settings/2/heatmap.json'
-import pathogen from '../../settings/3/biodiv.json'
+// import geomap from '../../settings/0/heatmap.json'
+// import biodiv from '../../settings/1/heatmap.json'
+// import biomass from '../../settings/2/heatmap.json'
+// import pathogen from '../../settings/3/biodiv.json'
+
+import geomap from '../../settings/0/umekita.json'
+import norail from '../../settings/1/heatmap.json'
+import rail from '../../settings/2/heatmap.json'
+import orail from '../../settings/3/heatmap.json'
 
 const MAP_STYLE = 'mapbox://styles/ricky189/ckl2880100ncb17mlxy595yo4';
 const MAPBOX_ACCESS_TOKEN = config.mapboxToken;
 
 // Viewport settings
-
 const colors = [[239,243,255],[198,219,239],[158,202,225],[107,174,214],[49,130,189],[8,81,156]];
 
+// const INITIAL_VIEW_STATE = {
+//   longitude: 139.7315,
+//   latitude: 35.6556,
+//   zoom: 15,
+//   pitch: 0,
+//   bearing: 0
+// };
+
 const INITIAL_VIEW_STATE = {
-  longitude: 139.7315,
-  latitude: 35.6556,
+  longitude: 135.50013055,
+  latitude: 34.69760833,
   zoom: 15,
   pitch: 0,
   bearing: 0
@@ -33,8 +45,10 @@ const INITIAL_VIEW_STATE = {
 // DeckGL react component
 export function DeckMap() {
   var idx = useSelector(selectindex);
-  var year = Number(useSelector(selectYear)) - 2045;
+  var year = Number(useSelector(selectYear));
   
+  const map = geomap
+
   const themelist = [
     new GridLayer({
       id: 'GridLayer',
@@ -49,7 +63,7 @@ export function DeckMap() {
     }),
     new PolygonLayer({
         id: '0',
-        data: geomap,
+        data: map,
         pickable: true,
         stroked: false,
         filled: true,
@@ -67,7 +81,7 @@ export function DeckMap() {
     }),
     new PolygonLayer({
       id: '1',
-      data: geomap,
+      data: map,
       pickable: true,
       stroked: false,
       filled: true,
@@ -75,9 +89,9 @@ export function DeckMap() {
       lineWidthMinPixels: 1,
       extruded: false,
       getPolygon: d => d.geometry.coordinates[0] as [number,number][],
-      getElevation: d => biomass[year][d.properties.id].color*10,
+      getElevation: d => norail[year][d.properties.id].color*10,
       getFillColor: d => {
-        return colors[biomass[year][d.properties.id].color] as [number,number,number];
+        return colors[norail[year][d.properties.id].color] as [number,number,number];
       },
       updateTriggers: {
         getFillColor: [year],
@@ -89,7 +103,7 @@ export function DeckMap() {
     }),
     new PolygonLayer({
         id: '2',
-        data: geomap,
+        data: map,
         pickable: true,
         stroked: false,
         filled: true,
@@ -97,9 +111,9 @@ export function DeckMap() {
         lineWidthMinPixels: 1,
         extruded: false,
         getPolygon: d => d.geometry.coordinates[0] as [number,number][],
-        getElevation: d => biodiv[year][d.properties.id].color*10,
+        getElevation: d => rail[year][d.properties.id].color*10,
         getFillColor: d => {
-          return colors[biodiv[year][d.properties.id].color] as [number,number,number];
+          return colors[rail[year][d.properties.id].color] as [number,number,number];
         },
         updateTriggers: {
           getFillColor: [year],
@@ -111,7 +125,7 @@ export function DeckMap() {
     }),
     new PolygonLayer({
       id: '3',
-      data: geomap,
+      data: map,
       pickable: true,
       stroked: false,
       filled: true,
@@ -119,9 +133,13 @@ export function DeckMap() {
       lineWidthMinPixels: 1,
       extruded: false,
       getPolygon: d => d.geometry.coordinates[0] as [number,number][],
-      getElevation: d => pathogen[d.properties.id].color*10,
+      getElevation: d => orail[year][d.properties.id].color*10,
       getFillColor: d => {
-        return colors[pathogen[d.properties.id].color] as [number,number,number];
+        return colors[orail[year][d.properties.id].color] as [number,number,number];
+      },
+      updateTriggers: {
+        getFillColor: [year],
+        getElevation: [year]
       },
       getLineColor: [80, 80, 80],
       getLineWidth: 1,

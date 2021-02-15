@@ -34,4 +34,5 @@ export const dataloaderSlice = createSlice({
 export const { setReadyState, setGeogrid, setModule } = dataloaderSlice.actions;
 
 export const selectReady = (state: RootState) => state.dataloader.ready;
+export const selectGeogrid = (state: RootState) => state.dataloader.geogrid
 export default dataloaderSlice.reducer;

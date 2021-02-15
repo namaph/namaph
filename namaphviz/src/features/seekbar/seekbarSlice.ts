@@ -1,12 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AppThunk, RootState } from '../../store';
+import { RootState } from '../../store';
+import config from '../../settings/config.json';
 
 interface DataLoaderState {
   year: number | number[]
 }
 
+const seekconf = config.seekConf;
+
+
 const initialState: DataLoaderState = {
-  year: 2045
+  year: seekconf.valueMin
 };
 
 export const dataloaderSlice = createSlice({
