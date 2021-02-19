@@ -2,6 +2,8 @@
 `namaph` is a unified framework for visualizing Ecosystem simulation.
 This project is forked by CityScopeJS.
 
+The logo and the brand name “namaph” are not part of the GPL-3.0 License.
+
 ## Requirements
 - `docker`
 - [Optional] `nodejs`
