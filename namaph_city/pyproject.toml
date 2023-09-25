@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "namaph-city"
+version = "0.1.0"
+description = ""
+authors = [
+"Sei Takeda <sei06k14@gmail.com>", 
+"Yasushi Sakai <yasushi.accounts@fastmail.com>"
+]
+readme = "readme"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+seaborn = "^0.12.2"
+numpy = "^1.26.0"
+celluloid = "^0.2.0"
+pandas = "^2.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
